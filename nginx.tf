@@ -15,3 +15,11 @@ resource "helm_release" "my_app" {
 
   depends_on = [helm_release.ingress-nginx]
 }
+resource "helm_release" "observability" {
+  name             = "observability"
+  chart            = "./grafana/"
+  namespace        = "monitoring"
+  create_namespace = true
+
+  values = [file("./grafana/values.yaml")]
+}
