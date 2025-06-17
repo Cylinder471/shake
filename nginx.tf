@@ -7,6 +7,17 @@ resource "helm_release" "ingress-nginx" {
   version          = "4.10.0"
   values           = [file("./nginx.yaml")]
 }
+data "kubernetes_service" "ingress_nginx" {
+  metadata {
+    name      = "ingress-nginx-controller"
+    namespace = "ingress-nginx"
+  }
+
+  depends_on = [helm_release.ingress-nginx]
+}
+output "ingress_nginx_load_balancer_hostname" {
+  value = data.kubernetes_service.ingress_nginx.status[0].load_balancer[0].ingress[0].hostname
+}
 resource "helm_release" "my_app" {
   name             = "my-app"
   chart            = "./Chart" # путь к локальному чарту
@@ -14,12 +25,4 @@ resource "helm_release" "my_app" {
   create_namespace = false
 
   depends_on = [helm_release.ingress-nginx]
-}
-resource "helm_release" "observability" {
-  name             = "observability"
-  chart            = "./grafana/"
-  namespace        = "monitoring"
-  create_namespace = true
-
-  values = [file("./grafana/values.yaml")]
 }

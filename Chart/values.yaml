@@ -14,7 +14,10 @@ ingress:
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
   hosts:
-    - host: ""
-      paths:
-        - path: /
-          pathType: Prefix
+  - paths:
+    - path: /
+      pathType: Prefix
+    - path: /app(/|$)(.*)
+      pathType: Prefix
+service:
+  port: 80
